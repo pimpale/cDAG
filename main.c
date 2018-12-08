@@ -21,10 +21,10 @@ struct Node
 
 } typedef Node;
 
-//will malloc a new node for us
-Node newNode(char* value)
+/* will malloc a new node for us */
+Node* newNode(char* value)
 {
-	Node node = { 0 };
+	Node *node = malloc(sizeof(Node));
 	node->ancestorlen = 1;
 	node->ancestornum = 0;
 	node->ancestors = malloc(node->ancestorlen * sizeof(Node*));
@@ -32,33 +32,33 @@ Node newNode(char* value)
 	node->childnum = 0;
 	node->children= malloc(node->childlen * sizeof(Node*));
 	node->value = value;
-	return node;
+	return (node);
 }
 
-//checks if child is in parent's ancestors
+/* checks if child is in parent's ancestors */
 int inAncestry(Node* parent, Node* child)
 {
 	for(int i = 0; i < parent->ancestornum; i++)
 	{
 		if(parent->ancestors[i] == child)
 		{
-			return 1;
+			return (1);
 		}
 	}
-	return 0;
+	return (0);
 }
-//adds a child child to parent node parent, or does nothing
+/*adds a child child to parent node parent, or does nothing */
 void addChild(Node* parent, Node* child)
 {
-	//before doing anything, check if child is in parents ancestors
+	/*before doing anything, check if child is in parents ancestors */
 	if(inAncestry(parent, child))
 	{
 		fprintf(stderr,"Failed to add node %s as child to node %s due to cycle\n", child->value, parent->value);
 		return;
 	}
 
-	//add child link to parent
-	if(parent->childnum + 1 > parent->childlen) //extend array if full
+	/*add child link to parent */
+	if (parent->childnum + 1 > parent->childlen) /* extend array if full */
 	{
 		parent->childlen += 10;
 		parent->children = realloc(parent->children,parent->childlen * sizeof(Node*));
@@ -66,16 +66,16 @@ void addChild(Node* parent, Node* child)
 	parent->children[parent->childnum] = child;
 	parent->childnum++;
 
-	//add all ancestors of parent to child
-	if(child->ancestornum + parent->ancestornum + 1 > child->ancestorlen) //extend array if full
+	/*add all ancestors of parent to child */
+	if (child->ancestornum + parent->ancestornum + 1 > child->ancestorlen) /* extend array if full */
 	{
 		child->ancestorlen += 1 + parent->ancestorlen;
 		child->ancestors = realloc(child->ancestors,child->ancestorlen * sizeof(Node*));
 	}
-	//add the parent to the child's ancestors
+	/* add the parent to the child's ancestors */
 	child->ancestors[child->ancestornum] = parent;
 	child->ancestornum++;
-	//add the parent's ancestor's to the child's ancestors
+	/*add the parent's ancestor's to the child's ancestors */
 	for(int i = 0; i < parent->ancestornum; i++)
 	{
 		if(!inAncestry(child, parent->ancestors[i]))
@@ -110,12 +110,12 @@ void printNode(Node* node)
 int main(int argc, char** argv)
 {
 	{
-		Node* n1 = &newNode("1");
-		Node* n2 = &newNode("2");
-		Node* n3 = &newNode("3");
-		Node* n4 = &newNode("4");
-		Node* n5 = &newNode("5");
-		Node* n6 = &newNode("6");
+		Node* n1 = newNode("1");
+		Node* n2 = newNode("2");
+		Node* n3 = newNode("3");
+		Node* n4 = newNode("4");
+		Node* n5 = newNode("5");
+		Node* n6 = newNode("6");
 
 		addChild(n1, n2);
 		addChild(n1, n3);
